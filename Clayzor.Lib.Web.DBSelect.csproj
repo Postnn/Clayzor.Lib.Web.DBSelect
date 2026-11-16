@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Clayzor.Lib.Web.DBSelect</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Clayzor.Lib.Web.Controls\Clayzor.Lib.Web.Controls.csproj" />
+    <ProjectReference Include="..\Clayzor.Lib.Entities\Clayzor.Lib.Entities.csproj" />
+  </ItemGroup>
+  <Import Project="$(SolutionDir)build\StyleGuard.targets" Condition="Exists('$(SolutionDir)build\StyleGuard.targets')" />
+</Project>
