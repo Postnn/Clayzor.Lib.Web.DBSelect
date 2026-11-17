@@ -5,17 +5,16 @@ using Clayzor.Lib.Web.Controls.Components.Select;
 
 namespace Clayzor.Lib.Web.DBSelect.Equipment;
 
-/// <summary>
-/// Источник типов оборудования для <see cref="ClaySelect{TItem, TValue}"/>.
-/// </summary>
+/// <summary>Источник типов оборудования для <see cref="ClaySelect{TItem, TValue}"/>.</summary>
 public sealed class EquipmentTypeSelectDataSource : IClaySelectDataSource<EquipmentType, int?>
 {
     private readonly DbManager _db;
 
-    /// <summary>
-    /// Создаёт источник с менеджером подключения текущего circuit.
-    /// </summary>
+    /// <summary>Создаёт источник с менеджером подключения текущего circuit.</summary>
     public EquipmentTypeSelectDataSource(DbManager db) => _db = db;
+
+    /// <summary>Сортировать результаты по алфавиту вместо идентификатора.</summary>
+    public bool SortByName { get; set; }
 
     /// <inheritdoc />
     public async Task<ClaySelectResult<EquipmentType>> SearchAsync(
@@ -27,6 +26,7 @@ public sealed class EquipmentTypeSelectDataSource : IClaySelectDataSource<Equipm
         {
             Search = request.SearchText,
             LimitPlusOne = request.Limit + 1,
+            SortByName,
         })).ToList();
         cancellationToken.ThrowIfCancellationRequested();
 
