@@ -6,7 +6,7 @@ using Clayzor.Lib.Web.Controls.Components.Select;
 namespace Clayzor.Lib.Web.DBSelect.Documents;
 
 /// <summary>Источник документов из отдельной базы документооборота.</summary>
-public sealed class DocumentSelectDataSource : IClaySelectDataSource<DocumentLookup, int?>, IDisposable
+public class DocumentSelectDataSource : IClaySelectDataSource<DocumentLookup, int?>, IDisposable
 {
     private readonly DbManager _db;
 
@@ -48,7 +48,7 @@ public sealed class DocumentSelectDataSource : IClaySelectDataSource<DocumentLoo
     }
 
     /// <summary>Возвращает поставщика, если среди лиц документа кроме владельца есть ровно одно лицо.</summary>
-    public async Task<int?> GetSingleShipperIdAsync(int documentId, int ownerId)
+    public virtual async Task<int?> GetSingleShipperIdAsync(int documentId, int ownerId)
     {
         var rows = await _db.QueryAsync<int>(SQLQueries.SELECT_ПоставщикиДокумента, new
         {
