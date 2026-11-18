@@ -11,6 +11,9 @@ public sealed class UpsEquipmentSelectDataSource : IClaySelectDataSource<UpsEqui
     private readonly DbManager _db;
     private readonly bool _upsOnly;
 
+    /// <summary>Расположение, ограничивающее выбор UPS тем же офисом.</summary>
+    public int? LocationId { get; set; }
+
     /// <summary>Создаёт источник с признаком выбора только UPS.</summary>
     public UpsEquipmentSelectDataSource(DbManager db, bool upsOnly)
     {
@@ -27,6 +30,7 @@ public sealed class UpsEquipmentSelectDataSource : IClaySelectDataSource<UpsEqui
         var rows = (await _db.QueryAsync<UpsEquipmentLookup>(SQLQueries.SELECT_ОборудованиеДляUPS, new
         {
             UpsOnly = _upsOnly ? 1 : 0,
+            LocationId,
             Search = request.SearchText,
             LimitPlusOne = request.Limit + 1,
         })).ToList();
