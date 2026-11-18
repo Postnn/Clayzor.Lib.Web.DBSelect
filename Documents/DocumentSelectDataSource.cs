@@ -63,6 +63,18 @@ public class DocumentSelectDataSource : IClaySelectDataSource<DocumentLookup, in
         return persons.Count == 1 ? persons[0] : null;
     }
 
+    /// <summary>Возвращает акты списания с оборудованием одним запросом без N+1 чтения документов.</summary>
+    public virtual async Task<IReadOnlyList<DocumentLookup>> GetWriteOffActsAsync(
+        int equipmentId,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var rows = await _db.QueryAsync<DocumentLookup>(
+            SQLQueries.SELECT_АктыСписанияОборудования, new { EquipmentId = equipmentId });
+        cancellationToken.ThrowIfCancellationRequested();
+        return rows.ToList();
+    }
+
     /// <summary>Освобождает отдельное подключение к базе документов.</summary>
     public void Dispose() => _db.Dispose();
 }
