@@ -16,6 +16,9 @@ public class DocumentSelectDataSource : IClaySelectDataSource<DocumentLookup, in
     /// <summary>Фильтр документов по связанному лицу.</summary>
     public int? PersonId { get; set; }
 
+    /// <summary>Точный тип документа; null отключает фильтр.</summary>
+    public int? DocumentTypeId { get; set; }
+
     /// <inheritdoc />
     public async Task<ClaySelectResult<DocumentLookup>> SearchAsync(
         ClaySelectSearchRequest request,
@@ -26,6 +29,7 @@ public class DocumentSelectDataSource : IClaySelectDataSource<DocumentLookup, in
         {
             Search = request.SearchText,
             PersonId,
+            DocumentTypeId,
             LimitPlusOne = request.Limit + 1,
         })).ToList();
         cancellationToken.ThrowIfCancellationRequested();

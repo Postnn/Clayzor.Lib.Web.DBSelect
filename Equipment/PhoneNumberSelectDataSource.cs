@@ -1,3 +1,4 @@
+using System.Text;
 using Clayzor.Lib.DALC;
 using Clayzor.Lib.Entities;
 using Clayzor.Lib.Entities.Inventory;
@@ -10,6 +11,24 @@ public sealed class PhoneNumberSelectDataSource : IClaySelectDataSource<PhoneNum
 {
     private readonly DbManager _db;
 
+    /// <summary>Текущее расположение оборудования.</summary>
+    public int? LocationId { get; set; }
+
+    /// <summary>Текущий ответственный сотрудник.</summary>
+    public int? EmployeeId { get; set; }
+
+    /// <summary>Тип оборудования.</summary>
+    public int? EquipmentTypeId { get; set; }
+
+    /// <summary>Основной номер текущего оборудования.</summary>
+    public int? PhoneIdBase { get; set; }
+
+    /// <summary>Текущее оборудование.</summary>
+    public int? EquipmentId { get; set; }
+
+    /// <summary>Номера, уже присутствующие в редактируемом списке.</summary>
+    public IReadOnlyCollection<int> ExcludedPhoneIds { get; set; } = [];
+
     /// <summary>Создаёт источник с подключением текущего circuit.</summary>
     public PhoneNumberSelectDataSource(DbManager db) => _db = db;
 
@@ -19,11 +38,17 @@ public sealed class PhoneNumberSelectDataSource : IClaySelectDataSource<PhoneNum
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var rows = (await _db.QueryAsync<PhoneNumberLookup>(SQLQueries.SELECT_ТелефонныеНомераДляВыбора, new
-        {
-            Search = request.SearchText,
-            LimitPlusOne = request.Limit + 1,
-        })).ToList();
+        var parameters = new Dapper.DynamicParameters();
+        parameters.Add("@LocationId", LocationId);
+        parameters.Add("@EmployeeId", EmployeeId);
+        parameters.Add("@EquipmentTypeId", EquipmentTypeId);
+        parameters.Add("@PhoneIdBase", PhoneIdBase);
+        parameters.Add("@EquipmentId", EquipmentId);
+        parameters.Add("@Search", request.SearchText);
+        parameters.Add("@LimitPlusOne", request.Limit + 1);
+        var sql = new StringBuilder(SQLQueries.SELECT_ТелефонныеНомераДляВыбора);
+        PhoneNumberQuery.AddExcludedIds(sql, parameters, ExcludedPhoneIds);
+        var rows = (await _db.QueryAsync<PhoneNumberLookup>(sql.ToString(), parameters)).ToList();
         cancellationToken.ThrowIfCancellationRequested();
         return new ClaySelectResult<PhoneNumberLookup>
         {
