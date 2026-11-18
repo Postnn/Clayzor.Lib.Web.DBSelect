@@ -6,7 +6,7 @@ using Clayzor.Lib.Web.Controls.Components.Select;
 namespace Clayzor.Lib.Web.DBSelect.Equipment;
 
 /// <summary>
-/// Источник моделей оборудования с фильтрацией по выбранному типу.
+/// Источник полных моделей оборудования с необязательной фильтрацией по типу.
 /// </summary>
 public sealed class EquipmentModelSelectDataSource : IClaySelectDataSource<EquipmentModel, int?>
 {
@@ -25,13 +25,10 @@ public sealed class EquipmentModelSelectDataSource : IClaySelectDataSource<Equip
         ClaySelectSearchRequest request,
         CancellationToken cancellationToken = default)
     {
-        if (Filter.EquipmentTypeId is null)
-            return new ClaySelectResult<EquipmentModel>();
-
         cancellationToken.ThrowIfCancellationRequested();
         var rows = (await _db.QueryAsync<EquipmentModel>(SQLQueries.SELECT_МоделиОборудованияДляВыбора, new
         {
-            EquipmentTypeId = Filter.EquipmentTypeId.Value,
+            EquipmentTypeId = Filter.EquipmentTypeId,
             Search = request.SearchText,
             LimitPlusOne = request.Limit + 1,
         })).ToList();
