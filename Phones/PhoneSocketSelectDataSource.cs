@@ -16,6 +16,9 @@ public sealed class PhoneSocketSelectDataSource(DbManager db) : IClaySelectDataS
     /// <summary>Текущая розетка, включаемая даже при занятости.</summary>
     public int? SocketId { get; set; }
 
+    /// <summary>В черновике выбрано оборудование.</summary>
+    public bool HasDraftEquipment { get; set; }
+
     /// <summary>Расположения оборудования из черновика формы.</summary>
     public IReadOnlyCollection<int> EquipmentLocationIds { get; set; } = [];
 
@@ -43,7 +46,7 @@ public sealed class PhoneSocketSelectDataSource(DbManager db) : IClaySelectDataS
         }
         else
         {
-            if (StationId is null) return new ClaySelectResult<PhoneSocketLookup>();
+            if (HasDraftEquipment || StationId is null) return new ClaySelectResult<PhoneSocketLookup>();
             var officeId = await db.ExecuteScalarAsync<int?>(SQLQueries.SELECT_ТелефонОфисСтанции,
                 new { StationId = StationId.Value }, commandType: System.Data.CommandType.Text);
             cancellationToken.ThrowIfCancellationRequested();

@@ -24,8 +24,8 @@ public sealed class PhoneEquipmentSelectDataSource(DbManager db) : IClaySelectDa
     /// <summary>Текущий телефон; 0 соответствует поведению поиска legacy.</summary>
     public int PhoneId { get; set; }
 
-    /// <summary>Уже связанное оборудование.</summary>
-    public IReadOnlyCollection<int> ExcludedEquipmentIds { get; set; } = [];
+    /// <summary>Уже связанные составные ключи оборудования.</summary>
+    public IReadOnlyCollection<PhoneEquipmentKey> ExcludedKeys { get; set; } = [];
 
     /// <inheritdoc />
     public async Task<ClaySelectResult<PhoneEquipmentLookup>> SearchAsync(ClaySelectSearchRequest request, CancellationToken cancellationToken = default)
@@ -41,7 +41,13 @@ public sealed class PhoneEquipmentSelectDataSource(DbManager db) : IClaySelectDa
         parameters.Add("@PhoneId", PhoneId);
         parameters.Add("@Search", request.SearchText);
         parameters.Add("@LimitPlusOne", request.Limit + 1);
-        PhoneSelectQuery.Exclude(sql, parameters, "F.КодОборудования", ExcludedEquipmentIds);
+        var index = 0;
+        foreach (var equipmentId in ExcludedKeys.Select(item => item.EquipmentId).Distinct())
+        {
+            var equipmentParameter = $"@ExcludedEquipment{index++}";
+            parameters.Add(equipmentParameter, equipmentId);
+            sql.Append(" AND F.КодОборудования <> ").Append(equipmentParameter);
+        }
         sql.Append(" ORDER BY Название");
         var rows = await db.QueryAsync<PhoneEquipmentLookup>(sql.ToString(), parameters);
         cancellationToken.ThrowIfCancellationRequested();
