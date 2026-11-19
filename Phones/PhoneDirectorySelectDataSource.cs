@@ -1,4 +1,3 @@
-using System.Text;
 using Clayzor.Lib.DALC;
 using Clayzor.Lib.Entities;
 using Clayzor.Lib.Entities.Inventory;
@@ -43,7 +42,7 @@ public sealed class PhoneDirectorySelectDataSource(DbManager db) : IClaySelectDa
             PhoneDirectoryMode.DrivenBy => SQLQueries.SELECT_ТелефонВедущиеДляВыбора,
             _ => SQLQueries.SELECT_ТелефонОтображаемыеДляВыбора,
         };
-        var sql = new StringBuilder(statement);
+        var sql = PhoneSelectQuery.BeforeOrderBy(statement);
         var parameters = new DynamicParameters();
         parameters.Add("@StationId", StationId.Value);
         parameters.Add("@Search", request.SearchText);

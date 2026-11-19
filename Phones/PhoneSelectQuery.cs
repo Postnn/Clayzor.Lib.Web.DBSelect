@@ -18,6 +18,12 @@ internal static class PhoneSelectQuery
         }
     }
 
+    internal static StringBuilder BeforeOrderBy(string statement)
+    {
+        var index = statement.LastIndexOf("ORDER BY", StringComparison.OrdinalIgnoreCase);
+        return new StringBuilder(index >= 0 ? statement[..index] : statement);
+    }
+
     internal static ClaySelectResult<T> Result<T>(IEnumerable<T> source, int limit) where T : class
     {
         var rows = source.Take(limit + 1).ToList();

@@ -1,4 +1,3 @@
-using System.Text;
 using Clayzor.Lib.DALC;
 using Clayzor.Lib.Entities;
 using Clayzor.Lib.Entities.Inventory;
@@ -33,7 +32,7 @@ public sealed class PhoneEquipmentSelectDataSource(DbManager db) : IClaySelectDa
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (PhoneTypeId is null || StationId is null) return new ClaySelectResult<PhoneEquipmentLookup>();
-        var sql = new StringBuilder(SQLQueries.SELECT_ТелефонОборудованиеДляВыбора);
+        var sql = PhoneSelectQuery.BeforeOrderBy(SQLQueries.SELECT_ТелефонОборудованиеДляВыбора);
         var parameters = new DynamicParameters();
         parameters.Add("@PhoneTypeId", PhoneTypeId.Value);
         parameters.Add("@StationId", StationId.Value);
