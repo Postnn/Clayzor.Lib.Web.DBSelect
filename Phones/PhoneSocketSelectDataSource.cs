@@ -26,6 +26,7 @@ public sealed class PhoneSocketSelectDataSource(DbManager db) : IClaySelectDataS
     public async Task<ClaySelectResult<PhoneSocketLookup>> SearchAsync(ClaySelectSearchRequest request, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (StationId is null) return new ClaySelectResult<PhoneSocketLookup>();
         var parameters = new DynamicParameters();
         parameters.Add("@SocketId", SocketId);
         parameters.Add("@Search", request.SearchText);
@@ -46,7 +47,7 @@ public sealed class PhoneSocketSelectDataSource(DbManager db) : IClaySelectDataS
         }
         else
         {
-            if (HasDraftEquipment || StationId is null) return new ClaySelectResult<PhoneSocketLookup>();
+            if (HasDraftEquipment) return new ClaySelectResult<PhoneSocketLookup>();
             var officeId = await db.ExecuteScalarAsync<int?>(SQLQueries.SELECT_ТелефонОфисСтанции,
                 new { StationId = StationId.Value }, commandType: System.Data.CommandType.Text);
             cancellationToken.ThrowIfCancellationRequested();
