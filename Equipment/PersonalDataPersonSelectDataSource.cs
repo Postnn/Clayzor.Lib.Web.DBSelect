@@ -31,7 +31,7 @@ public sealed class PersonalDataPersonSelectDataSource : IClaySelectDataSource<P
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var rows = (await _db.QueryAsync<PersonLookup>(SQLQueries.SELECT_ЛицаПерсональныхДанных, new
+        var rows = (await _db.QueryRequiredAsync<PersonLookup>(SQLQueries.SELECT_ЛицаПерсональныхДанных, new
         {
             Search = request.SearchText,
             LimitPlusOne = request.Limit + 1,
@@ -54,7 +54,7 @@ public sealed class PersonalDataPersonSelectDataSource : IClaySelectDataSource<P
         if (id is null)
             return null;
         cancellationToken.ThrowIfCancellationRequested();
-        var rows = await _db.QueryAsync<PersonLookup>(
+        var rows = await _db.QueryRequiredAsync<PersonLookup>(
             SQLQueries.SELECT_ЛицоПерсональныхДанныхПоИдентификатору, new { Id = id.Value });
         cancellationToken.ThrowIfCancellationRequested();
         return rows.FirstOrDefault();

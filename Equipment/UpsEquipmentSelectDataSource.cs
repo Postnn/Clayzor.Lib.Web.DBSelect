@@ -27,7 +27,7 @@ public sealed class UpsEquipmentSelectDataSource : IClaySelectDataSource<UpsEqui
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var rows = (await _db.QueryAsync<UpsEquipmentLookup>(SQLQueries.SELECT_ОборудованиеДляUPS, new
+        var rows = (await _db.QueryRequiredAsync<UpsEquipmentLookup>(SQLQueries.SELECT_ОборудованиеДляUPS, new
         {
             UpsOnly = _upsOnly ? 1 : 0,
             LocationId,
@@ -48,8 +48,8 @@ public sealed class UpsEquipmentSelectDataSource : IClaySelectDataSource<UpsEqui
         if (id is null)
             return null;
         cancellationToken.ThrowIfCancellationRequested();
-        var rows = await _db.QueryAsync<UpsEquipmentLookup>(
-            SQLQueries.SELECT_ОборудованиеДляUPSПоИдентификатору, new { Id = id.Value });
+        var rows = await _db.QueryRequiredAsync<UpsEquipmentLookup>(
+            SQLQueries.SELECT_ОборудованиеДляUPSПоИдентификатору, new { Id = id.Value, UpsOnly = _upsOnly ? 1 : 0 });
         cancellationToken.ThrowIfCancellationRequested();
         return rows.FirstOrDefault();
     }
