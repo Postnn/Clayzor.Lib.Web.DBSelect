@@ -1,3 +1,4 @@
+using System.Text;
 using Clayzor.Lib.DALC;
 using Clayzor.Lib.Entities;
 using Clayzor.Lib.Entities.Inventory;
@@ -32,7 +33,7 @@ public sealed class PhoneEquipmentSelectDataSource(DbManager db) : IClaySelectDa
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (PhoneTypeId is null || StationId is null) return new ClaySelectResult<PhoneEquipmentLookup>();
-        var sql = PhoneSelectQuery.BeforeOrderBy(SQLQueries.SELECT_ТелефонОборудованиеДляВыбора);
+        var sql = new StringBuilder(SQLQueries.SELECT_ТелефонОборудованиеДляВыбора);
         var parameters = new DynamicParameters();
         parameters.Add("@PhoneTypeId", PhoneTypeId.Value);
         parameters.Add("@StationId", StationId.Value);
@@ -41,14 +42,7 @@ public sealed class PhoneEquipmentSelectDataSource(DbManager db) : IClaySelectDa
         parameters.Add("@PhoneId", PhoneId);
         parameters.Add("@Search", request.SearchText);
         parameters.Add("@LimitPlusOne", request.Limit + 1);
-        var index = 0;
-        foreach (var equipmentId in ExcludedKeys.Select(item => item.EquipmentId).Distinct())
-        {
-            var equipmentParameter = $"@ExcludedEquipment{index++}";
-            parameters.Add(equipmentParameter, equipmentId);
-            sql.Append(" AND F.КодОборудования <> ").Append(equipmentParameter);
-        }
-        sql.Append(" ORDER BY Название");
+        PhoneFinderData.ExcludeEquipment(sql, parameters, ExcludedKeys.Select(item => item.EquipmentId));
         var rows = await db.QueryAsync<PhoneEquipmentLookup>(sql.ToString(), parameters);
         cancellationToken.ThrowIfCancellationRequested();
         return PhoneSelectQuery.Result(rows, request.Limit);
